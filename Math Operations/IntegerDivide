@@ -1,0 +1,57 @@
+-- V1.0a AR
+-- 30.12.2016 16:08:00 AR V1.0b
+-- 01.04.2017 07:28:16 AR V1.0c
+-- 18.08.2017 17:12:50 AR V1.0d
+
+generic = {
+  parameter = {
+    inputs = 2
+  },
+
+  init = function(self)
+    block.setInputsPinCount(self.parameter.inputs)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Divide', 'Integer divide: q = a // b // c...')
+    gui.add('Edit', 'EditNumberOfInputs', 'Number of inputs')
+    gui.set('EditNumberOfInputs', 'Integer', self.parameter.inputs)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.inputs = gui.get('EditNumberOfInputs', 'Integer')
+    block.setInputsPinCount(self.parameter.inputs)
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "'\\xE2\\x88\\x95\\xE2\\x88\\x95'")
+  end,
+
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(A)
+            return Q
+          end
+
+        }
+      ]==]
+    local replaces = {
+      ['A'] = table.concat(block.getInputsPinNames(), ', '),
+      ['Q'] = table.concat(block.getInputsPinNames(), ' // '),
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+

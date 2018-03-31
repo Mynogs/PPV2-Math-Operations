@@ -1,0 +1,56 @@
+-- V1.0a AR
+-- 30.12.2016 16:09:06 AR V1.0b
+-- 02.01.2017 16:37:17 AR V1.0c
+-- 18.08.2017 17:11:46 AR V1.0d
+
+generic = {
+  parameter = {
+    inputs = 2
+  },
+
+  init = function(self)
+    block.setInputsPinCount(self.parameter.inputs)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Add', 'Add: q = a + b + ...')
+    gui.add('Edit', 'EditNumberOfInputs', 'Number of inputs')
+    gui.set('EditNumberOfInputs', 'Integer', self.parameter.inputs)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.inputs = gui.get('EditNumberOfInputs', 'Integer')
+    block.setInputsPinCount(self.parameter.inputs)
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "'+'")
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(A)
+            return Q
+          end
+
+        }
+      ]==]
+    local replaces = {
+      ['A'] = table.concat(block.getInputsPinNames(), ', '),
+      ['Q'] = table.concat(block.getInputsPinNames(), ' + '),
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+

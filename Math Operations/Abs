@@ -1,0 +1,46 @@
+-- V1.0a AR
+-- 30.12.2016 16:05:26 AR V1.0b
+-- 01.04.2017 07:11:19 AR V1.0c
+
+generic = {
+  parameter = {
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Abs', [[
+Calculate the absolut value: q = |a|
+]])
+    gui.setSize()
+  end,
+
+  apply = function(self)
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "'\\xE2\\x8E\\xAEa\\xE2\\x8E\\xAE'")
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = math.abs
+
+        }
+      ]==]
+    return source
+  end,
+
+}
+

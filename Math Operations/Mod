@@ -1,0 +1,51 @@
+
+
+generic = {
+  parameter = {
+    modulo = 1
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Modulo', 'Modulo function: q = math.fmod(a, modulo)')
+    gui.add('Edit', 'EditModulo', 'Modulo')
+    gui.set('EditModulo', 'Number', self.parameter.modulo)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.modulo = gui.get('EditModulo', 'Number')
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, self.parameter.modulo)
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(a)
+            return math.fmod(a, MODULO)
+          end
+
+        }
+      ]==]
+    local replaces = {
+      ['MODULO'] = self.parameter.modulo
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+

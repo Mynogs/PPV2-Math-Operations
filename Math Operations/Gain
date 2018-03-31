@@ -1,0 +1,59 @@
+-- V1.0a AR
+-- 01.04.2017 07:15:46 AR V1.0b
+
+generic = {
+  parameter = {
+    gain = 1
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Gain', 'Gain: q = a * gain')
+    gui.add('Edit', 'EditGain', 'Gain')
+    gui.set('EditGain', 'Number', self.parameter.gain)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.gain = gui.get('EditGain', 'Number')
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x53, self.parameter.gain)
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(a)
+            return STEP
+          end
+
+        }
+      ]==]
+    local replaces = {}
+    if self.parameter.gain == -1 then
+      replaces['STEP'] = '-a'
+    elseif self.parameter.gain == 0 then
+      replaces['STEP'] = '0'
+    elseif self.parameter.gain == 1 then
+      replaces['STEP'] = 'a'
+    else
+      replaces['STEP'] = 'a * ' .. self.parameter.gain
+    end
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+

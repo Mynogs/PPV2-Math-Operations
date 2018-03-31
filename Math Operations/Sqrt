@@ -1,0 +1,43 @@
+-- V1.0a AR
+-- 30.12.2016 16:05:26 AR V1.0b
+
+generic = {
+  parameter = {
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'sqrt', 'sqrt')
+    gui.setSize(260, 100)
+  end,
+
+  apply = function(self)
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "'\\xE2\\x88\\x9A'")
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = math.sqrt
+
+        }
+      ]==]
+    return source
+  end,
+
+}
+

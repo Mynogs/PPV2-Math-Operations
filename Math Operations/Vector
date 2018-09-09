@@ -1,0 +1,44 @@
+-- 09.09.2018 11:17:20 AR V1.0a
+
+generic = {
+  parameter = {
+  },
+
+  init = function(self)
+    block.setInputsPinCount(2)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'sqr', 'sqr')
+    gui.setSize()
+  end,
+
+  apply = function(self)
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "'\\xE2\\x9E\\x9A'")
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(a, b)
+            return math.sqrt(a ^ 2 + b ^ 2)
+          end
+
+        }
+      ]==]
+    return source
+  end,
+
+}
+

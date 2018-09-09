@@ -1,5 +1,5 @@
 # PPV2 Math Operations
-This library is part of the [P+ simulation software](https://github.com/Mynogs/PPV2-Simulation-System).
+This library is part of the [p+ simulation software](https://github.com/Mynogs/PPV2-Simulation-System).
 
 Serveral math block. Wraps the Lua math library and math operators.
 

@@ -24,7 +24,7 @@ generic = {
   end,
 
   avatar = function(self)
-    return block.getDefaultAvatar(0x50, "'x^2'")
+    return block.getDefaultAvatar(0x50, "'a^2'")
   end,
 
   generate = function(self)
@@ -32,8 +32,8 @@ generic = {
       [==[
         return {
 
-          step = function(a)
-            return a * a
+          step = function(a, b)
+            return a ^ 2
           end
 
         }

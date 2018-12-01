@@ -1,0 +1,54 @@
+
+generic = {
+  parameter = {
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setInputPinTypeRestrains(1, 'table')
+    block.setOutputsPinCount(1)
+    block.setOutputPinTypeRestrains(1, 'table')
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Delta', [[
+Calc delta between element a[i + 1] and a[i]
+The output array has one elememnt less then the input arra.
+
+q[1] = a[2] - a[1], q[2] = a[3] - a[2], ..., q[n - 1] = a[n] - a[n - 1]
+]])
+    gui.setSize()
+  end,
+
+  apply = function(self)
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "'-[]'")
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(a)
+            q = {}
+            for i = 1, #a - 1 do
+              q[i] = a[i + 1] - a[i]
+            end
+            return q
+          end
+
+        }
+      ]==]
+    return source
+  end,
+
+}
+

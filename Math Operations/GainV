@@ -1,0 +1,62 @@
+-- 22.12.2018 17:21:32 AR V1.0a
+
+generic = {
+  parameter = {
+    gain = 1
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setInputPinTypeRestrains(1, 'table')
+    block.setOutputsPinCount(1)
+    block.setOutputPinTypeRestrains(1, 'table')
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Gain', 'Gain: q[] = a[] * gain')
+    gui.add('Edit', 'EditGain', 'Gain')
+    gui.set('EditGain', 'Number', self.parameter.gain)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.gain = gui.get('EditGain', 'Number')
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x53, self.parameter.gain)
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(a)
+            local q = {}
+            STEP
+            return q
+          end
+
+        }
+      ]==]
+    local replaces = {}
+    if self.parameter.gain == -1 then
+      replaces['STEP'] = 'for i = 1, #a do q[i] = -a[i] end'
+    elseif self.parameter.gain == 0 then
+      replaces['STEP'] = 'for i = 1, #a do q[i] = 0 end'
+    elseif self.parameter.gain == 1 then
+      replaces['STEP'] = 'for i = 1, #a do q[i] = a[i] end'
+    else
+      replaces['STEP'] = 'for i = 1, #a do q[i] = a[i] * ' .. self.parameter.gain .. ' end'
+    end
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+

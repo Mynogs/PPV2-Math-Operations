@@ -1,0 +1,77 @@
+-- 22.12.2018 06:34:40 AR V1.0a
+
+-- Algorithm to convert A Decimal to A Fraction
+-- Original paper, written by J. Kennedy, available at:
+-- https://sites.google.com/site/johnkennedyshome/home/downloadable-papers/dec2frac.pdf
+-- Based on
+-- https://github.com/kennyledet/Algorithm-Implementations/blob/master/Decimal_To_Fraction/Lua/Yonaba/dec2frac.lua
+
+
+generic = {
+  parameter = {
+    accuracy = 1E-4,
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(2)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Fraction', 'Convert number to fractional')
+    gui.add('Edit', 'EditAccuracy', 'Accuracy', {NumberMode = true})
+    gui.set('EditAccuracy', 'Expression', self.parameter.accuracy)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.accuracy = gui.get('EditAccuracy', 'Expression')
+  end,
+
+  close = function()
+
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "'num\\n\\xE2\\x80\\x95\\xE2\\x80\\x95\\\\xE2\\x80\\x95\\\\xE2\\x80\\x95\\ndenum'")
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(decimal)
+            local sign = decimal >= 0.0 and 1 or -1
+            decimal = math.abs(decimal)
+            if decimal == math.floor(decimal) then
+              return decimal * sign, 1
+            end
+            if decimal < 1E-19 then
+              return sign, 9999999999999999999.0
+            end
+            if decimal > 1E+19 then
+              return 9999999999999999999.0 * sign, 1
+            end
+            local denum, predenum, z, num = 1, 0, decimal
+            repeat
+              z = 1.0 / (z - math.floor(z))
+              local denum2 = denum
+              denum = denum * math.floor(z) + predenum
+              predenum = denum2
+              num = math.floor(decimal * denum)
+            until ((math.abs(decimal - (num / denum)) < ACCURACY) or (z == math.floor(z)))
+            return num * sign, denum
+          end
+
+        }
+      ]==]
+    local replaces = {
+      ['ACCURACY'] = self.parameter.accuracy
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}

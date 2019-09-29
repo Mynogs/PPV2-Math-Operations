@@ -1,0 +1,96 @@
+-- 29.09.2019 07:42:11 AR V1.0a
+
+block.setSize(101, 51)
+generic = {
+  parameter = {
+    q1 = 0.0,
+    q2 = 100.0,
+    error = 0.0,
+  },
+
+  init = function(self)
+    block.setInputsPinCount(3)
+    block.setOutputsPinCount(1)
+    block.setInputPinName(2, 'p1')
+    block.setInputPinName(3, 'p2')
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Bias', [[
+Define a linear funktion by two points.
+Useful for unit conversion.
+
+If input p1 == p2 then the output is the error value.
+In a case of an error limits are ignored!
+]])
+    gui.add('Edit', 'EditP1Q', 'Point 1: Convert p1 to')
+    gui.add('Edit', 'EditP2Q', 'Point 2: Convert p2 to')
+    gui.add('Edit', 'EditError', 'Error output value')
+    gui.add('CheckBox', 'CheckBoxLimit', 'Limit output to point 1 and point 2', {Width = 200})
+    gui.set('EditP1Q', 'Number', self.parameter.q1)
+    gui.set('EditP2Q', 'Number', self.parameter.q2)
+    gui.set('EditError', 'Number', self.parameter.error)
+    gui.set('CheckBoxLimit', 'Checked', self.parameter.limit)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.q1 = gui.get('EditP1Q', 'Number')
+    self.parameter.q2 = gui.get('EditP2Q', 'Number')
+    self.parameter.error = gui.get('EditError', 'Number')
+    self.parameter.limit = gui.get('CheckBoxLimit', 'Checked')
+    return gui.assert(
+      'Convert',
+      self.parameter.q1 ~= self.parameter.q2, 'Output point values must be different'
+    )
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x00, "'+*'")
+  end,
+
+  generate = function(self)
+    local limit = ''
+    if self.parameter.limit then
+      if self.parameter.q1 < self.parameter.q2 then
+        limit = 'if q < Q1 then q = Q1 elseif q > Q2 then q = Q2 end'
+      else
+        limit = 'if q < Q2 then q = Q2 elseif q > Q1 then q = Q1 end'
+      end
+      local replaces = {
+        ['Q1'] = self.parameter.q1,
+        ['Q2'] = self.parameter.q2,
+      }
+      limit = string.gsub(limit, '%a+%d*', replaces)
+    end
+    local q21 = self.parameter.q2 - self.parameter.q1
+    local source =
+      [==[
+        return {
+
+          step = function(a, p1, p2)
+            if p1 == p2 then
+              return ERROR
+            end
+            local q = (a - p1) / (p2 - p1) Q21 Q1
+            LIMIT
+            return q
+          end
+
+        }
+      ]==]
+    local replaces = {
+      ['ERROR'] = self.parameter.error,
+      ['Q1'] = self.parameter.q1 == 0.0 and '' or '+ ' .. self.parameter.q1,
+      ['Q21'] = aq21 == 1.0 and '' or '* ' .. q21,
+      ['LIMIT'] = limit
+    }    return string.gsub(source, '%a+%d*', replaces)
+  end,
+
+}
+
